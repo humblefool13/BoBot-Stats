@@ -25,7 +25,6 @@ const PriceUrl = "https://api.coingecko.com/api/v3/simple/price?ids=solana%2Ceth
 let solPrice = 0;
 let ethPrice = 0;
 
-
 async function updatePrice() {
   const req = await fetch(PriceUrl);
   const temp = await req.json();
@@ -138,7 +137,7 @@ async function embedSalesOS(event, big) {
       { name: "Bought by", value: buyer, inline: true },
     )
     .setTimestamp()
-    .setFooter({ text: 'Powered by Bobot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
   if (big) {
     embed.setImage(image);
   } else {
@@ -168,7 +167,7 @@ async function embedSalesME(event, slug, big) {
       { name: "Bought by", value: buyerString, inline: true },
     )
     .setTimestamp()
-    .setFooter({ text: 'Powered by Bobot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
   if (big) {
     embed.setImage(image);
   } else {
@@ -195,7 +194,7 @@ async function embedSalesLR(event, slug, big) {
       { name: "Bought by", value: buyer, inline: true },
     )
     .setTimestamp()
-    .setFooter({ text: 'Powered by Bobot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
   if (big) {
     embed.setImage(image);
   } else {
@@ -226,7 +225,7 @@ function embedListOS(event, big) {
       { name: "Expires on", value: `<t:${parseInt(expire_timestamp / 1000)}:F>`, inline: true },
     )
     .setTimestamp()
-    .setFooter({ text: 'Powered by Bobot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
   if (big) {
     embed.setImage(image);
   } else {
@@ -253,7 +252,7 @@ function embedListsLR(event, big) {
       { name: "Expires on", value: `<t:${expire_timestamp}:F>`, inline: true },
     )
     .setTimestamp()
-    .setFooter({ text: 'Powered by Bobot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
   if (big) {
     embed.setImage(image);
   } else {
@@ -280,7 +279,7 @@ async function embedListsME(event, big) {
       { name: "Listed By", value: `[${seller.slice(0, 5)}](https://magiceden.io/u/${seller})`, inline: true },
     )
     .setTimestamp()
-    .setFooter({ text: 'Powered by Bobot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
   if (big) {
     embed.setImage(image);
   } else {
@@ -373,7 +372,7 @@ module.exports = {
         const times = fs.readFileSync("./marketplaces/magiceden.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
         let timeStampLastLine = collections.find((el) => el.includes(symbol));
-        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now()/1000)}`;
+        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)}`;
         let timestampLast = timeStampLastLine.split(",");
         timestampLast = timestampLast[1];
         ++done;
@@ -477,12 +476,13 @@ module.exports = {
     async function subFilter() {
       const subs = await sub_records.find();
       const subscriberCount = subs.length;
-      client.user.setActivity(`${subscriberCount} Collections' Activities !`, { type: 'WATCHING' });
+      client.user.setActivity(`${subscriberCount} Collections !`, { type: 'WATCHING' });
       const subscribers = subs.map(e => e.discord_id);
       const members = await client.guilds.cache.get("969155191339384892").members.fetch();
-      members.each((member) => {
-        if (!subscribers.includes(member.id)) return;
-        if (!member.roles.cache.has("991001363997659178")) member.roles.add("991001363997659178");
+      members.each((m) => {
+        const id = m.id;
+        if (m.roles.cache.has("991001363997659178") && !subscribers.includes(id)) return m.roles.remove("991001363997659178");
+        if (!m.roles.cache.has("991001363997659178") && subscribers.includes(id)) return m.roles.add("991001363997659178");
       });
       subs.forEach(async (subscription) => {
         const end_timestamp = subscription.end_timestamp;
@@ -503,7 +503,6 @@ module.exports = {
       });
     };
     subFilter();
-    setInterval(subFilter, 10 * 60 * 1000);
-
+    setInterval(subFilter, 60 * 1000);
   },
 };

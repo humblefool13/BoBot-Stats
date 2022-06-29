@@ -100,7 +100,7 @@ module.exports = {
           type: "GUILD_CATEGORY"
         });
         const sales_channel = await category.createChannel("📈︱sales", {
-          topic: "Sales channel Managed by Bobot Sales Bot : https://discord.gg/HweZtrzAnX",
+          topic: "Sales channel Managed by BoBot Sales Bot : https://discord.gg/HweZtrzAnX",
           permissionOverwrites: [
             {
               id: client.user.id,
@@ -112,7 +112,7 @@ module.exports = {
           ],
         });
         const listings_channel = await category.createChannel("📈︱listings", {
-          topic: "Listings Channel Managed by Bobot Sales Bot : https://discord.gg/HweZtrzAnX",
+          topic: "Listings Channel Managed by BoBot Sales Bot : https://discord.gg/HweZtrzAnX",
           permissionOverwrites: [
             {
               id: client.user.id,

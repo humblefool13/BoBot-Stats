@@ -89,7 +89,7 @@ module.exports = {
           type: "GUILD_CATEGORY"
         });
         const sales_channel = await category.createChannel("📈︱sales", {
-          topic: "Sales channel Managed by Bobot Sales Bot : https://discord.gg/HweZtrzAnX",
+          topic: "Sales channel Managed by BoBot Sales Bot : https://discord.gg/HweZtrzAnX",
           permissionOverwrites: [
             {
               id: client.user.id,
@@ -101,7 +101,7 @@ module.exports = {
           ],
         });
         const listings_channel = await category.createChannel("📈︱listings", {
-          topic: "Listings Channel Managed by Bobot Sales Bot : https://discord.gg/HweZtrzAnX",
+          topic: "Listings Channel Managed by BoBot Sales Bot : https://discord.gg/HweZtrzAnX",
           permissionOverwrites: [
             {
               id: client.user.id,
@@ -157,7 +157,7 @@ module.exports = {
           type: "GUILD_CATEGORY"
         });
         const sales_channel = await category.createChannel("📈︱sales", {
-          topic: "Sales channel Managed by Bobot Sales Bot : https://discord.gg/HweZtrzAnX",
+          topic: "Sales channel Managed by BoBot Sales Bot : https://discord.gg/HweZtrzAnX",
           permissionOverwrites: [
             {
               id: client.user.id,
@@ -169,7 +169,7 @@ module.exports = {
           ],
         });
         const listings_channel = await category.createChannel("📈︱listings", {
-          topic: "Listings Channel Managed by Bobot Sales Bot : https://discord.gg/HweZtrzAnX",
+          topic: "Listings Channel Managed by BoBot Sales Bot : https://discord.gg/HweZtrzAnX",
           permissionOverwrites: [
             {
               id: client.user.id,
@@ -205,7 +205,7 @@ module.exports = {
         findcollection.big = big;
         findcollection.save().then(() => {
           return interaction.editReply({
-            content: `You have re-setup your configuration for ${findcollection.opensea_slug} . The old channels will stop working and the bot will start with the freshly made channels - <#${sales_channel.id}> & <#${listings_channel.id}>  . The bot will start posting sales and listings soon . You can rename the channel or move them to other categories but please do not make any changes in channels' permissions else it might affect functionality of bot.`,
+            content: `You have re-setup your configuration for ${findcollection.opensea_slug} . The old channels will stop working and the bot will start with the freshly made channels - <#${sales_channel.id}> & <#${listings_channel.id}> . The bot will start posting sales and listings soon . You can rename the channel or move them to other categories but please do not make any changes in channels' permissions else it might affect functionality of bot.`,
             ephemeral: true,
           })
         });
