@@ -6,6 +6,9 @@ const { WebSocket } = require('ws');
 const { OpenSeaStreamClient, EventType } = require('@opensea/stream-js');
 const fetch = require("node-fetch");
 const { RateLimiter } = require("limiter");
+const PriceUrl = "https://api.coingecko.com/api/v3/simple/price?ids=solana%2Cethereum&vs_currencies=usd";
+let solPrice = 0;
+let ethPrice = 0;
 const limiter_OS = new RateLimiter({
   tokensPerInterval: 4,
   interval: "second",
@@ -21,10 +24,11 @@ const limiter_LR = new RateLimiter({
   interval: "second",
   fireImmediately: true
 });
-const PriceUrl = "https://api.coingecko.com/api/v3/simple/price?ids=solana%2Cethereum&vs_currencies=usd";
-let solPrice = 0;
-let ethPrice = 0;
-
+const limiter_XY = new RateLimiter({
+  tokensPerInterval: 4,
+  interval: "second",
+  fireImmediately: true
+});
 async function updatePrice() {
   const req = await fetch(PriceUrl);
   const temp = await req.json();
@@ -40,6 +44,14 @@ async function getOS(url) {
   const response = await result.json();
   return response;
 };
+async function getOSKey(url) {
+  const remainingRequests = await limiter_OS.removeTokens(1);
+  if (remainingRequests < 0) return;
+  const options = { method: 'GET', headers: { Accept: 'application/json', 'X-API-KEY': process.env['os_key'] } };
+  const result = await fetch(url, options);
+  const response = await result.json();
+  return response;
+};
 async function getME(url) {
   const remainingRequests = await limiter_ME.removeTokens(1);
   if (remainingRequests < 0) return;
@@ -51,6 +63,20 @@ async function getLR(url) {
   const remainingRequests = await limiter_LR.removeTokens(1);
   if (remainingRequests < 0) return;
   const result = await fetch(url);
+  const response = await result.json();
+  return response;
+};
+async function getXY(url) {
+  const remainingRequests = await limiter_XY.removeTokens(1);
+  if (remainingRequests < 0) return;
+  const options = {
+    headers: {
+      accept: 'application/json',
+      'X-API-Key': process.env["x2y2_key"],
+    },
+    method: "GET"
+  };
+  const result = await fetch(url, options);
   const response = await result.json();
   return response;
 };
@@ -98,6 +124,20 @@ async function getBuyerStatusLR(buyer, slug) {
   const field = found ? `[${buyer.slice(0, 5)}](https://looksrare.org/accounts/${buyer})` : `[${buyer.slice(0, 5)}](https://looksrare.org/accounts/${buyer}) ( New Holder <a:tadada:990317457187172382> )`;
   return field;
 };
+async function getBuyerStatusXY(buyer, slug) {
+  let found = false;
+  const url = `https://api.opensea.io/api/v1/collections?asset_owner=${buyer.trim()}&offset=0&limit=300`;
+  let collections;
+  do {
+    collections = await getOS(url);
+  } while (!Array.isArray(collections));
+  collections.forEach((collection) => {
+    if (collection.slug !== slug) return;
+    if (collection.owned_asset_count > 1) found = true;
+  });
+  const field = found ? `[${buyer.slice(0, 5)}](https://x2y2.io/user/${buyer}/items)` : `[${buyer.slice(0, 5)}](https://x2y2.io/user/${buyer}/items) ( New Holder <a:tadada:990317457187172382> )`;
+  return field;
+};
 /////////////////////////////////////////////
 ///////////////  GET EVENTS /////////////////
 async function getMEactivities(url) {
@@ -112,6 +152,13 @@ async function getLRevents(url) {
   do {
     events = await getLR(url);
   } while (!events || !events?.success);
+  return events;
+};
+async function getXYevents(url) {
+  let events;
+  do {
+    events = await getXY(url);
+  } while (!events || !events?.data);
   return events;
 };
 /////////////////////////////////////////////
@@ -202,6 +249,35 @@ async function embedSalesLR(event, slug, big) {
   };
   return embed;
 };
+async function embedSalesXY(event, slug, big) {
+  if (event.order.currency !== '0x0000000000000000000000000000000000000000' && event.order.currency !== '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') return;
+  const lister = event.from_address;
+  const buyer = await getBuyerStatusXY(event.to_address, slug);
+  const price = Number(event.order.price) / Math.pow(10, 18);
+  const priceUsd = (price * ethPrice).toFixed(2);
+  let metadata;
+  do {
+    metadata = await getOSKey(`https://api.opensea.io/api/v1/asset/${event.token.contract}/${event.token.token_id}/`);
+  } while (!metadata || !metadata?.name)
+  const url = `https://x2y2.io/eth/${event.token.contract}/${event.token.token_id}`;
+  let embed = new MessageEmbed()
+    .setTitle(metadata.name)
+    .setURL(url)
+    .setColor("#00FF00")
+    .setDescription(`has just been **SOLD** for **${price} ETH**\n( US$ ${priceUsd} ) on [X2Y2 Marketplace](https://x2y2.io 'click to open x2y2 marketplace') <:x2y2:992453235610755092> !`)
+    .addFields(
+      { name: "Sold By", value: `[${lister.slice(0, 5)}](https://x2y2.io/user/${lister}/items)`, inline: true },
+      { name: "Bought by", value: buyer, inline: true },
+    )
+    .setTimestamp()
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+  if (big) {
+    embed.setImage(metadata.image_url);
+  } else {
+    embed.setThumbnail(metadata.image_url);
+  };
+  return embed;
+};
 /////////////////////////////////////////////
 //////////////  LISTS EMBED /////////////////
 function embedListOS(event, big) {
@@ -257,6 +333,35 @@ function embedListsLR(event, big) {
     embed.setImage(image);
   } else {
     embed.setThumbnail(image);
+  };
+  return embed;
+};
+async function embedListsXY(event, big) {
+  if (event.order.currency !== '0x0000000000000000000000000000000000000000' && event.order.currency !== '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') return;
+  const lister = event.from_address;
+  const expires = event.order.end_at;
+  const price = Number(event.order.price) / Math.pow(10, 18);
+  const priceUsd = (price * ethPrice).toFixed(2);
+  let metadata;
+  do {
+    metadata = await getOSKey(`https://api.opensea.io/api/v1/asset/${event.token.contract}/${event.token.token_id}/`);
+  } while (!metadata || !metadata?.name)
+  const url = `https://x2y2.io/eth/${event.token.contract}/${event.token.token_id}`;
+  let embed = new MessageEmbed()
+    .setTitle(metadata.name)
+    .setURL(url)
+    .setColor("#FF0000")
+    .setDescription(`has just been **LISTED** for **${price} ETH**\n( US$ ${priceUsd} ) on [X2Y2 Marketplace](https://x2y2.io 'click to open x2y2 marketplace') <:x2y2:992453235610755092> !`)
+    .addFields(
+      { name: "Listed By", value: `[${lister.slice(0, 5)}](https://x2y2.io/user/${lister}/items)`, inline: true },
+      { name: "Expires on", value: `<t:${expires}:F>`, inline: true },
+    )
+    .setTimestamp()
+    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' });
+  if (big) {
+    embed.setImage(metadata.image_url);
+  } else {
+    embed.setThumbnail(metadata.image_url);
   };
   return embed;
 };
@@ -374,7 +479,7 @@ module.exports = {
         let timeStampLastLine = collections.find((el) => el.includes(symbol));
         if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)}`;
         let timestampLast = timeStampLastLine.split(",");
-        timestampLast = timestampLast[1];
+        timestampLast = Number(timestampLast[1]);
         ++done;
         activities.forEach(async (event) => {
           if (event.blockTime <= timestampLast) return;
@@ -408,7 +513,7 @@ module.exports = {
       });
     };
 
-    //////////////// LOOKSRARE EVENTS ////////////////
+    //////////////// ETHEREUM EVENTS ////////////////
 
     function getEthCollections(configurations) {
       let eth = [];
@@ -417,6 +522,7 @@ module.exports = {
         eth.push(config);
       });
       pollLREvents(eth);
+      pollXYEvents(eth);
     };
     getEthCollections(configurations);
     setInterval(function() { getEthCollections(configurations); }, 60000);
@@ -436,7 +542,7 @@ module.exports = {
         let timeStampLastLine = collections.find((el) => el.includes(address));
         if (!timeStampLastLine) timeStampLastLine = `a,${Date.now()}`;
         let timestampLast = timeStampLastLine.split(",");
-        timestampLast = timestampLast[1];
+        timestampLast = Number(timestampLast[1]);
         ++done;
         events.forEach(async (event) => {
           const eventTimestamp = new Date(event.createdAt).getTime()
@@ -468,6 +574,68 @@ module.exports = {
           };
         });
         if (done === configs.length) fs.writeFileSync("./marketplaces/looksrare.txt", str);
+      });
+    };
+    async function pollXYEvents(configs) {
+      let done = 0;
+      let str = "";
+      configs.forEach(async (config) => {
+        const address = config.contract_address.trim();
+        const slug = config.opensea_slug.trim();
+        const urlList = `https://api.x2y2.org/v1/events?limit=200&type=list&contract=${address}`;
+        const urlSale = `https://api.x2y2.org/v1/events?limit=200&type=sale&contract=${address}`;
+        const geteventsLists = await getXYevents(urlList);
+        const geteventsSales = await getXYevents(urlSale);
+        let listings = geteventsLists.data;
+        let sales = geteventsSales.data;
+        listings.sort(function(a, b) {
+          return b.order.created_at - a.order.created_at;
+        });
+        sales.sort(function(a, b) {
+          return b.order.created_at - a.order.created_at;
+        });
+        str = str + [address, sales[0].order.created_at, listings[0].order.created_at].join(",") + "\n";
+        const times = fs.readFileSync("./marketplaces/x2y2.txt", { encoding: 'utf8', flag: 'r' });
+        const collections = times.split("\n");
+        let timeStampLastLine = collections.find((el) => el.includes(address));
+        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)},${parseInt(Date.now() / 1000)}`;
+        let timestampLast = timeStampLastLine.split(",");
+        const timestampLastSales = Number(timestampLast[1]);
+        const timestampLastLists = Number(timestampLast[2]);
+        ++done;
+        sales.forEach(async (sale) => {
+          const eventTimestamp = Number(sale.order.created_at);
+          if (eventTimestamp <= timestampLastSales) return;
+          const embed = await embedSalesXY(sale, slug, config.big);
+          if (!embed) return;
+          const channel = await client.guilds.cache.get(config.server_id).channels.fetch(config.sale_channel);
+          const webhooks = await channel.fetchWebhooks();
+          webhooks.each((webhook) => {
+            if (webhook.id !== config.sales_webhook_id) return;
+            webhook.send({
+              username: config.collection_name,
+              avatarURL: config.collection_pfp,
+              embeds: [embed],
+            }).catch((e) => { });
+          });
+        });
+        listings.forEach(async (list) => {
+          const eventTimestamp = Number(list.order.created_at);
+          if (eventTimestamp <= timestampLastLists) return;
+          const embed = await embedListsXY(list, config.big);
+          if (!embed) return;
+          const channel = await client.guilds.cache.get(config.server_id).channels.fetch(config.list_channel);
+          const webhooks = await channel.fetchWebhooks();
+          webhooks.each((webhook) => {
+            if (webhook.id !== config.listings_webhook_id) return;
+            webhook.send({
+              username: config.collection_name,
+              avatarURL: config.collection_pfp,
+              embeds: [embed],
+            }).catch((e) => { });
+          });
+        });
+        if (done === configs.length) fs.writeFileSync("./marketplaces/x2y2.txt", str);
       });
     };
 
