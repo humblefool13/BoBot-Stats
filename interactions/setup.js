@@ -70,7 +70,7 @@ module.exports = {
           contract_address = await getContractAddress(opensea_slug);
         } while (!contract_address.startsWith("0x"))
       } else if (chain === "SOL") {
-        const ME_link = interaction.options.getString('magic_eden_link').catch((e) => { });
+        const ME_link = interaction.options.getString('magic_eden_link');
         if (!ME_link) return interaction.editReply({ content: "Providing a Magic Eden link is necessary for Solana collections.", ephemeral: true });
         magiceden_symbol = ME_link.slice(ME_link.lastIndexOf("/") + 1);
       };
