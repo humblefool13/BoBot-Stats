@@ -31,6 +31,15 @@ module.exports = {
   name: "replace",
   async interact(client, interaction) {
     try {
+      if(interaction.inGuild()) {
+        const guild = client.guilds.cache.get(interaction.guildId);
+        const permissions = guild.members.me.permissions;
+        if(!permissions.has(Permissions.FLAGS.MANAGE_ROLES)) return interaction.reply({content : `I do not have the \`MANAGE_ROLES\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+        if(!permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) return interaction.reply({content : `I do not have the \`MANAGE_WEBHOOKS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+        if(!permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) return interaction.reply({content : `I do not have the \`MANAGE_CHANNELS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+        if(!permissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) return interaction.reply({content : `I do not have the \`USE_EXTERNAL_EMOJIS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+        if(!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) return interaction.reply({content : `I do not have the \`SEND_MESSAGES\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+      };
       await interaction.deferReply({ ephemeral: true });
       if (!interaction.memberPermissions?.has("ADMINISTRATOR") && !interaction.memberPermissions?.has("MANAGE_GUILD") && interaction.user.id !== interaction.guild?.ownerId) return interaction.editReply({
         content: "This command can only be used by you in a Discord Server where either of the following apply :\n1) You are the Owner of the Discord Server.\n2) You have the **ADMINISTRATOR** permission in the server.\n3) You have the **MANAGE SERVER** permission in the server.",
