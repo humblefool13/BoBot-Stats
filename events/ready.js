@@ -424,32 +424,34 @@ module.exports = {
     clientOS.onEvents("*", [EventType.ITEM_SOLD, EventType.ITEM_LISTED], async (event) => {
       const slug = event.payload.collection.slug;
       if (!slugs.includes(slug)) return;
-      const config = configurations.find((el) => el.opensea_slug.trim() === slug);
-      if (event.event_type === "item_sold") {
-        const embed = await embedSalesOS(event, config.big);
-        const channel = await client.guilds.cache.get(config.server_id).channels.fetch(config.sale_channel);
-        const webhooks = await channel.fetchWebhooks();
-        webhooks.each((webhook) => {
-          if (webhook.id !== config.sales_webhook_id) return;
-          webhook.send({
-            username: config.collection_name,
-            avatarURL: config.collection_pfp,
-            embeds: [embed],
-          }).catch((e) => { });
-        });
-      } else {
-        const embed = embedListOS(event, config.big);
-        const channel = await client.guilds.cache.get(config.server_id).channels.fetch(config.list_channel);
-        const webhooks = await channel.fetchWebhooks();
-        webhooks.each((webhook) => {
-          if (webhook.id !== config.listings_webhook_id) return;
-          webhook.send({
-            username: config.collection_name,
-            avatarURL: config.collection_pfp,
-            embeds: [embed],
-          }).catch((e) => { });
-        });
-      };
+      configurations.forEach(async (config) => {
+        if (config.opensea_slug.trim() !== slug) return;
+        if (event.event_type === "item_sold") {
+          const embed = await embedSalesOS(event, config.big);
+          const channel = await client.guilds.cache.get(config.server_id).channels.fetch(config.sale_channel);
+          const webhooks = await channel.fetchWebhooks();
+          webhooks.each((webhook) => {
+            if (webhook.id !== config.sales_webhook_id) return;
+            webhook.send({
+              username: config.collection_name,
+              avatarURL: config.collection_pfp,
+              embeds: [embed],
+            }).catch((e) => { });
+          });
+        } else {
+          const embed = embedListOS(event, config.big);
+          const channel = await client.guilds.cache.get(config.server_id).channels.fetch(config.list_channel);
+          const webhooks = await channel.fetchWebhooks();
+          webhooks.each((webhook) => {
+            if (webhook.id !== config.listings_webhook_id) return;
+            webhook.send({
+              username: config.collection_name,
+              avatarURL: config.collection_pfp,
+              embeds: [embed],
+            }).catch((e) => { });
+          });
+        };
+      });
     });
 
     //////////////// MAGIC EDEN EVENTS ////////////////
@@ -463,7 +465,7 @@ module.exports = {
       pollSolanaEvents(sol);
     };
     getSolCollections(configurations);
-    setInterval(function() { getSolCollections(configurations); }, 60000);
+    setInterval(function () { getSolCollections(configurations); }, 60000);
     async function pollSolanaEvents(configs) {
       let done = 0;
       let str = "";
@@ -473,11 +475,11 @@ module.exports = {
         const url = `https://api-mainnet.magiceden.dev/v2/collections/${symbol}/activities?offset=0&limit=500`;
         const activities = await getMEactivities(url);
         const timestampLatest = activities[0].blockTime;
-        str = str + [symbol, timestampLatest].join(",") + "\n";
+        str = str + [symbol, timestampLatest, config.discord_id, config.number].join(",") + "\n";
         const times = fs.readFileSync("./marketplaces/magiceden.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
-        let timeStampLastLine = collections.find((el) => el.includes(symbol));
-        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)}`;
+        let timeStampLastLine = collections.find((el) => el.includes(symbol) && el.includes(config.discord_id) && el.includes(config.number));
+        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)},a,a`;
         let timestampLast = timeStampLastLine.split(",");
         timestampLast = Number(timestampLast[1]);
         ++done;
@@ -525,7 +527,7 @@ module.exports = {
       pollXYEvents(eth);
     };
     getEthCollections(configurations);
-    setInterval(function() { getEthCollections(configurations); }, 60000);
+    setInterval(function () { getEthCollections(configurations); }, 60000);
     async function pollLREvents(configs) {
       let done = 0;
       let str = "";
@@ -536,11 +538,11 @@ module.exports = {
         const getevents = await getLRevents(url);
         const events = getevents.data;
         const timestampLatest = new Date(events[0].createdAt).getTime();
-        str = str + [address, timestampLatest].join(",") + "\n";
+        str = str + [address, timestampLatest, config.discord_id, config.number].join(",") + "\n";
         const times = fs.readFileSync("./marketplaces/looksrare.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
-        let timeStampLastLine = collections.find((el) => el.includes(address));
-        if (!timeStampLastLine) timeStampLastLine = `a,${Date.now()}`;
+        let timeStampLastLine = collections.find((el) => el.includes(address) && el.includes(config.discord_id) && el.includes(config.number));
+        if (!timeStampLastLine) timeStampLastLine = `a,${Date.now()},a,a`;
         let timestampLast = timeStampLastLine.split(",");
         timestampLast = Number(timestampLast[1]);
         ++done;
@@ -588,17 +590,17 @@ module.exports = {
         const geteventsSales = await getXYevents(urlSale);
         let listings = geteventsLists.data;
         let sales = geteventsSales.data;
-        listings.sort(function(a, b) {
+        listings.sort(function (a, b) {
           return b.order.created_at - a.order.created_at;
         });
-        sales.sort(function(a, b) {
+        sales.sort(function (a, b) {
           return b.order.created_at - a.order.created_at;
         });
-        str = str + [address, sales[0].order.created_at, listings[0].order.created_at].join(",") + "\n";
+        str = str + [address, sales[0].order.created_at, listings[0].order.created_at, config.discord_id, config.number].join(",") + "\n";
         const times = fs.readFileSync("./marketplaces/x2y2.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
-        let timeStampLastLine = collections.find((el) => el.includes(address));
-        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)},${parseInt(Date.now() / 1000)}`;
+        let timeStampLastLine = collections.find((el) => el.includes(address) && el.includes(config.discord_id) && el.includes(config.number));
+        if (!timeStampLastLine) timeStampLastLine = `a,${parseInt(Date.now() / 1000)},${parseInt(Date.now() / 1000)},a,a`;
         let timestampLast = timeStampLastLine.split(",");
         const timestampLastSales = Number(timestampLast[1]);
         const timestampLastLists = Number(timestampLast[2]);
