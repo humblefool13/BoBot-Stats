@@ -32,14 +32,14 @@ module.exports = {
   name: "setup",
   async interact(client, interaction) {
     try {
-      if(interaction.inGuild()) {
+      if (interaction.inGuild()) {
         const guild = client.guilds.cache.get(interaction.guildId);
         const permissions = guild.me.permissions;
-        if(!permissions.has(Permissions.FLAGS.MANAGE_ROLES)) return interaction.reply({content : `I do not have the \`MANAGE_ROLES\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) return interaction.reply({content : `I do not have the \`MANAGE_WEBHOOKS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) return interaction.reply({content : `I do not have the \`MANAGE_CHANNELS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) return interaction.reply({content : `I do not have the \`USE_EXTERNAL_EMOJIS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) return interaction.reply({content : `I do not have the \`SEND_MESSAGES\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+        if (!permissions.has(Permissions.FLAGS.MANAGE_ROLES)) return interaction.reply({ content: `I do not have the \`MANAGE_ROLES\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) return interaction.reply({ content: `I do not have the \`MANAGE_WEBHOOKS\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) return interaction.reply({ content: `I do not have the \`MANAGE_CHANNELS\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) return interaction.reply({ content: `I do not have the \`USE_EXTERNAL_EMOJIS\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) return interaction.reply({ content: `I do not have the \`SEND_MESSAGES\` permission . Please grant me the permission before using this command.`, ephemeral: true });
       };
       await interaction.deferReply({ ephemeral: true });
       if (!interaction.memberPermissions?.has("ADMINISTRATOR") && !interaction.memberPermissions?.has("MANAGE_GUILD") && interaction.user.id !== interaction.guild?.ownerId) return interaction.editReply({
@@ -154,6 +154,10 @@ module.exports = {
         }).save().catch((e) => {
           console.log(e)
         });
+        const everyonePermissions = interaction.guild.roles.everyone.permissions;
+        if (!everyonePermissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
+          await interaction.guild.roles.everyone.permissions.add(Permissions.FLAGS.USE_EXTERNAL_EMOJIS);
+        };
         return interaction.editReply({
           content: `The sales and listings channels are set at <#${sales_channel.id}> & <#${listings_channel.id}> . The bot will start posting sales and listings soon . You can rename the channel or move them to other categories but please do not make any changes in channels' permissions else it might affect functionality of bot.`,
           ephemeral: true,
@@ -213,6 +217,10 @@ module.exports = {
         findcollection.collection_pfp = customisation[1];
         findcollection.big = big;
         findcollection.save().then(() => {
+          const everyonePermissions = interaction.guild.roles.everyone.permissions;
+          if (!everyonePermissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
+            interaction.guild.roles.everyone.permissions.add(Permissions.FLAGS.USE_EXTERNAL_EMOJIS);
+          };
           return interaction.editReply({
             content: `You have re-setup your configuration for ${findcollection.opensea_slug} . The old channels will stop working and the bot will start with the freshly made channels - <#${sales_channel.id}> & <#${listings_channel.id}> . The bot will start posting sales and listings soon . You can rename the channel or move them to other categories but please do not make any changes in channels' permissions else it might affect functionality of bot.`,
             ephemeral: true,
