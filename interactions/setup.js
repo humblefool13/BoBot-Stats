@@ -8,24 +8,16 @@ const limiter_OS = new RateLimiter({
   fireImmediately: true
 });
 const fetch = require("node-fetch");
-async function getContractAddress(slug) {
+async function getOSdata(slug) {
   const remainingRequests = await limiter_OS.removeTokens(1);
   if (remainingRequests < 0) return;
   const url = `https://api.opensea.io/api/v1/collection/${slug}`;
   const result = await fetch(url);
   const response = await result.json();
   const address = response.collection.primary_asset_contracts[0].address;
-  return address;
-};
-async function getCustomisedData(slug) {
-  const remainingRequests = await limiter_OS.removeTokens(1);
-  if (remainingRequests < 0) return;
-  const url = `https://api.opensea.io/api/v1/collection/${slug}`;
-  const result = await fetch(url);
-  const response = await result.json();
   const name = response.collection.name;
   const pfp = response.collection.image_url;
-  return [name, pfp];
+  return [address, name, pfp];
 };
 
 module.exports = {
@@ -55,6 +47,7 @@ module.exports = {
       const size = interaction.options.getString('image_size');
       const opensea_link = interaction.options.getString('opensea_link');
       const opensea_slug = opensea_link.trim().slice(opensea_link.lastIndexOf("/") + 1);
+      const OS_data = await getOSdata(opensea_slug);
       const findsubs = await sub_records.find({
         discord_id: interaction.user.id,
       });
@@ -76,7 +69,7 @@ module.exports = {
       if (size === "big") big = true;
       if (chain === "ETH") {
         do {
-          contract_address = await getContractAddress(opensea_slug);
+          contract_address = OS_data[0];
         } while (!contract_address.startsWith("0x"))
       } else if (chain === "SOL") {
         const ME_link = interaction.options.getString('magic_eden_link');
@@ -85,7 +78,7 @@ module.exports = {
       };
       if (!findcollection) {
         do {
-          customisation = await getCustomisedData(opensea_slug);
+          customisation = [OS_data[1], OS_data[2]];
         } while (!customisation.length);
         const numbersSubs = findsubs.map((el) => el.number);
         const numbersConfigs = findconfigs.map((el) => el.number);
@@ -164,7 +157,7 @@ module.exports = {
         });
       } else {
         do {
-          customisation = await getCustomisedData(opensea_slug);
+          customisation = [OS_data[1], OS_data[2]];
         } while (!customisation.length);
         const category = await interaction.guild.channels.create("🛒 Listings & Sales 🛒", {
           type: "GUILD_CATEGORY"
