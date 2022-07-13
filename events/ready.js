@@ -474,7 +474,7 @@ module.exports = {
         const slug = config.opensea_slug.trim();
         const url = `https://api-mainnet.magiceden.dev/v2/collections/${symbol}/activities?offset=0&limit=500`;
         const activities = await getMEactivities(url);
-        const timestampLatest = activities[0].blockTime;
+        const timestampLatest = activities.length ? activities[0].blockTime : parseInt(Date.now() / 1000);
         str = str + [symbol, timestampLatest, config.discord_id, config.number].join(",") + "\n";
         const times = fs.readFileSync("./marketplaces/magiceden.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
@@ -537,7 +537,7 @@ module.exports = {
         const url = `https://api.looksrare.org/api/v1/events?collection=${address}&pagination[first]=150`;
         const getevents = await getLRevents(url);
         const events = getevents.data;
-        const timestampLatest = new Date(events[0].createdAt).getTime();
+        const timestampLatest = events.length ? new Date(events[0].createdAt).getTime() : new Date.now();
         str = str + [address, timestampLatest, config.discord_id, config.number].join(",") + "\n";
         const times = fs.readFileSync("./marketplaces/looksrare.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
@@ -596,7 +596,9 @@ module.exports = {
         sales.sort(function (a, b) {
           return b.order.created_at - a.order.created_at;
         });
-        str = str + [address, sales[0].order.created_at, listings[0].order.created_at, config.discord_id, config.number].join(",") + "\n";
+        const salesTimestamp = sales.length ? sales[0].order.created_at : parseInt(Date.now() / 1000);
+        const listsTimestamp = listings.length ? listings[0].order.created_at : parseInt(Date.now() / 1000);
+        str = str + [address, salesTimestamp, listsTimestamp, config.discord_id, config.number].join(",") + "\n";
         const times = fs.readFileSync("./marketplaces/x2y2.txt", { encoding: 'utf8', flag: 'r' });
         const collections = times.split("\n");
         let timeStampLastLine = collections.find((el) => el.includes(address) && el.includes(config.discord_id) && el.includes(config.number));
