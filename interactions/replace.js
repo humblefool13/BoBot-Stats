@@ -47,8 +47,11 @@ module.exports = {
       let big = false;
       const userid = interaction.user.id;
       let contract_address = "NA", magiceden_symbol = "NA";
-      const OS_data = await getOSdata(opensea_slug);
-      const customisation= [OS_data[1],OS_data[2]];
+      let OS_data;
+      do {
+        OS_data = await getOSdata(opensea_slug);
+      } while (!OS_data || !Array.isArray(OS_data))
+      const customisation = [OS_data[1], OS_data[2]];
       const chain = interaction.options.getString("chain");
       const role = interaction.options.getRole("base_role");
       const size = interaction.options.getString('image_size');

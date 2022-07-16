@@ -41,13 +41,16 @@ module.exports = {
       let contract_address = "NA", magiceden_symbol = "NA";
       let number = 0;
       let big = false;
-      let customisation = [];
       const chain = interaction.options.getString('chain');
       const role = interaction.options.getRole('base_role');
       const size = interaction.options.getString('image_size');
       const opensea_link = interaction.options.getString('opensea_link');
       const opensea_slug = opensea_link.trim().slice(opensea_link.lastIndexOf("/") + 1);
-      const OS_data = await getOSdata(opensea_slug);
+      let OS_data;
+      do {
+        OS_data = await getOSdata(opensea_slug);
+      } while (!OS_data || !Array.isArray(OS_data))
+      const customisation = [OS_data[1], OS_data[2]];
       const findsubs = await sub_records.find({
         discord_id: interaction.user.id,
       });
@@ -77,9 +80,6 @@ module.exports = {
         magiceden_symbol = ME_link.slice(ME_link.lastIndexOf("/") + 1);
       };
       if (!findcollection) {
-        do {
-          customisation = [OS_data[1], OS_data[2]];
-        } while (!customisation.length);
         const numbersSubs = findsubs.map((el) => el.number);
         const numbersConfigs = findconfigs.map((el) => el.number);
         numbersSubs.forEach((num) => {
@@ -182,9 +182,6 @@ module.exports = {
           ephemeral: true,
         });
       } else {
-        do {
-          customisation = [OS_data[1], OS_data[2]];
-        } while (!customisation.length);
         const category = await interaction.guild.channels.create("🛒 BoBot Sales 🛒", {
           type: "GUILD_CATEGORY"
         });
