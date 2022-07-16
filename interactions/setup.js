@@ -147,7 +147,11 @@ module.exports = {
           avatar: "https://media.discordapp.net/attachments/797163839765741568/988519804472287332/sales.jpg",
           reason: "This webhook was created by BoBot Sales Bot to post stats.",
         });
-        const stats_message = await stats_webhook.send({ content: "<a:loading:973124874124005396> Coming Soon!" });
+        const stats_message = await stats_webhook.send({
+          username: customisation[0] + " | BoBot",
+          avatarURL: customisation[1],
+          content: "<a:loading:973124874124005396> Coming Soon!",
+        });
         await new config_records({
           number: number,
           discord_id: interaction.user.id,
@@ -241,7 +245,11 @@ module.exports = {
           avatar: "https://media.discordapp.net/attachments/797163839765741568/988519804472287332/sales.jpg",
           reason: "This webhook was created by BoBot Sales Bot to post stats.",
         });
-        const stats_message = await stats_webhook.send({ content: "<a:loading:973124874124005396> Coming Soon!" });
+        const stats_message = await stats_webhook.send({
+          username: customisation[0] + " | BoBot",
+          avatarURL: customisation[1],
+          content: "<a:loading:973124874124005396> Coming Soon!",
+        });
         findcollection.server_id = interaction.guild.id;
         findcollection.sale_channel = sales_channel.id;
         findcollection.list_channel = listings_channel.id;

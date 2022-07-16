@@ -31,14 +31,14 @@ module.exports = {
   name: "replace",
   async interact(client, interaction) {
     try {
-      if(interaction.inGuild()) {
+      if (interaction.inGuild()) {
         const guild = client.guilds.cache.get(interaction.guildId);
         const permissions = guild.me.permissions;
-        if(!permissions.has(Permissions.FLAGS.MANAGE_ROLES)) return interaction.reply({content : `I do not have the \`MANAGE_ROLES\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) return interaction.reply({content : `I do not have the \`MANAGE_WEBHOOKS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) return interaction.reply({content : `I do not have the \`MANAGE_CHANNELS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) return interaction.reply({content : `I do not have the \`USE_EXTERNAL_EMOJIS\` permission . Please grant me the permission before using this command.`, ephemeral:true});
-        if(!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) return interaction.reply({content : `I do not have the \`SEND_MESSAGES\` permission . Please grant me the permission before using this command.`, ephemeral:true});
+        if (!permissions.has(Permissions.FLAGS.MANAGE_ROLES)) return interaction.reply({ content: `I do not have the \`MANAGE_ROLES\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) return interaction.reply({ content: `I do not have the \`MANAGE_WEBHOOKS\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) return interaction.reply({ content: `I do not have the \`MANAGE_CHANNELS\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) return interaction.reply({ content: `I do not have the \`USE_EXTERNAL_EMOJIS\` permission . Please grant me the permission before using this command.`, ephemeral: true });
+        if (!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) return interaction.reply({ content: `I do not have the \`SEND_MESSAGES\` permission . Please grant me the permission before using this command.`, ephemeral: true });
       };
       await interaction.deferReply({ ephemeral: true });
       if (!interaction.memberPermissions?.has("ADMINISTRATOR") && !interaction.memberPermissions?.has("MANAGE_GUILD") && interaction.user.id !== interaction.guild?.ownerId) return interaction.editReply({
@@ -144,7 +144,7 @@ module.exports = {
             }
           ],
         });
-        if (role.id === interaction.guild.id) {          
+        if (role.id === interaction.guild.id) {
           await stats_channel.permissionOverwrites.edit(interaction.guild.id, { VIEW_CHANNEL: true, SEND_MESSAGES: false, READ_MESSAGE_HISTORY: true, ADD_REACTIONS: true, USE_EXTERNAL_EMOJIS: true });
           await sales_channel.permissionOverwrites.edit(interaction.guild.id, { VIEW_CHANNEL: true, SEND_MESSAGES: false, READ_MESSAGE_HISTORY: true, ADD_REACTIONS: true, USE_EXTERNAL_EMOJIS: true });
           await listings_channel.permissionOverwrites.edit(interaction.guild.id, { VIEW_CHANNEL: true, SEND_MESSAGES: false, READ_MESSAGE_HISTORY: true, ADD_REACTIONS: true, USE_EXTERNAL_EMOJIS: true });
@@ -165,7 +165,11 @@ module.exports = {
           avatar: "https://media.discordapp.net/attachments/797163839765741568/988519804472287332/sales.jpg",
           reason: "This webhook was created by BoBot Sales Bot to post stats.",
         });
-        const stats_message = await stats_webhook.send({ content: "<a:loading:973124874124005396> Coming Soon!" });
+        const stats_message = await stats_webhook.send({
+          username: customisation[0] + " | BoBot",
+          avatarURL: customisation[1],
+          content: "<a:loading:973124874124005396> Coming Soon!",
+        });
         replace.server_id = interaction.guild.id;
         replace.sale_channel = sales_channel.id;
         replace.list_channel = listings_channel.id;
