@@ -15,6 +15,9 @@ const format = {
   collection_name: String,
   collection_pfp: String,
   big: Boolean,
+  stats_channel: String,
+  stats_webhook_id: String,
+  stats_webhook_message_id: String,
 };
 
 module.exports = mongoose.model('configurationRecords', format);
