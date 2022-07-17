@@ -57,8 +57,13 @@ module.exports = {
       const findcollection = await config_records.findOne({
         discord_id: interaction.user.id,
         opensea_slug: opensea_slug,
+        expired: false,
       });
       let findconfigs = await config_records.find({
+        discord_id: interaction.user.id,
+        expired: false,
+      });
+      const configs = await config_records.find({
         discord_id: interaction.user.id,
       });
       if (!findsubs.length) return interaction.editReply({
@@ -81,7 +86,7 @@ module.exports = {
       };
       if (!findcollection) {
         const numbersSubs = findsubs.map((el) => el.number);
-        const numbersConfigs = findconfigs.map((el) => el.number);
+        const numbersConfigs = configs.map((el) => el.number);
         numbersSubs.forEach((num) => {
           if (number > 0) return;
           if (numbersConfigs.includes(num)) return;
@@ -162,6 +167,8 @@ module.exports = {
           listings_webhook_id: listings_webhook.id,
           chain: chain,
           opensea_slug: opensea_slug,
+          expired: false,
+          expired_timestamp: 0,
           big: big,
           magiceden_symbol: magiceden_symbol,
           contract_address: contract_address,

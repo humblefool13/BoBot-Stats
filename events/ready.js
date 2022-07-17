@@ -407,7 +407,9 @@ module.exports = {
     let configurations;
     let slugs;
     async function updateConfigs() {
-      configurations = await config_records.find();
+      configurations = await config_records.find({
+        expired: false,
+      });
       slugs = configurations.map((el) => el.opensea_slug.trim());
     };
     await updateConfigs();
@@ -666,9 +668,24 @@ module.exports = {
         }).catch((e) => {
           console.log(e);
         });
-        await config_records.deleteOne({
+        const config = await config_records.findOne({
           discord_id: subscription.discord_id,
           number: number,
+        });
+        config.expired = true;
+        config.expired_timestamp = Date.now();
+        await config.save().catch((e) => { });
+      });
+      const configs = await config_records.find({
+        expired: true,
+      });
+      configs.forEach(async (config) => {
+        const timestamp = config.expired_timestamp;
+        const diff = Date.now() - timestamp;
+        if (diff < 1000 * 60 * 60 * 24 * 14) return;
+        await config_records.deleteOne({
+          discord_id: config.discord_id,
+          number: config.number,
         }).catch((e) => {
           console.log(e);
         });
