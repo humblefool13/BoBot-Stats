@@ -122,7 +122,7 @@ module.exports = {
                 number: findconfig.number,
               });
               config.expired = false;
-              config.expiredTimestamp = 0;
+              config.expired_timestamp = 0;
               config.save().catch((e) => { });
               await new sub_records({
                 discord_id: userid,
