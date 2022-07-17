@@ -49,15 +49,15 @@ module.exports = {
       const userid = interaction.user.id;
       let contract_address = "NA", magiceden_symbol = "NA";
       let OS_data;
-      do {
-        OS_data = await getOSdata(opensea_slug);
-      } while (!OS_data || !Array.isArray(OS_data))
-      const customisation = [OS_data[1], OS_data[2]];
       const chain = interaction.options.getString("chain");
       const role = interaction.options.getRole("base_role");
       const size = interaction.options.getString('image_size');
       const opensea_link = interaction.options.getString("opensea_link");
       const opensea_slug = opensea_link.trim().slice(opensea_link.lastIndexOf("/") + 1);
+      do {
+        OS_data = await getOSdata(opensea_slug);
+      } while (!OS_data || !Array.isArray(OS_data))
+      const customisation = [OS_data[1], OS_data[2]];
       if (size === "big") big = true;
       if (chain === "ETH") {
         do {

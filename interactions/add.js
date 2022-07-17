@@ -117,7 +117,7 @@ module.exports = {
                 }).then(collector.stop());
               });
             } else {
-              const config = await config_records.find({
+              const config = await config_records.findOne({
                 discord_id: userid,
                 number: findconfig.number,
               });
@@ -134,7 +134,8 @@ module.exports = {
                 console.log(e);
               });
               return i.update({
-                content: `The subscription for the user <@${userid}> - for the collection ${config.opensea_slug} has been successfully subscribed on <t:${parseInt(interaction.createdTimestamp / 1000)}:F> for **${months}** months and the subscription will end on <t:${parseInt((interaction.createdTimestamp + months * 31 * 24 * 60 * 60 * 1000) / 1000)}:F>.\n**Number of subscriptions on this account : \`${foundNumber + 1}\`**`,
+                components: [],
+                content: `The subscription for the user <@${userid}> - for the collection - ${config.opensea_slug} has been successfully extended on <t:${parseInt(interaction.createdTimestamp / 1000)}:F> for **${months}** months and the subscription will end on <t:${parseInt((interaction.createdTimestamp + months * 31 * 24 * 60 * 60 * 1000) / 1000)}:F>.\n**Number of subscriptions on this account : \`${foundNumber + 1}\`**`,
               }).catch((e) => {
                 console.log(e);
               });
