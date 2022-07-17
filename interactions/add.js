@@ -74,7 +74,7 @@ module.exports = {
         const configs = await config_records.find({
           discord_id: userid,
         });
-        const left = foundNumber - total;
+        const left = foundNumber - activeNumber;
         configs.forEach((config) => {
           row.components[0].addOptions({
             label: config.opensea_slug,
