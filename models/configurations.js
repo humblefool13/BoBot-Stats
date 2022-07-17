@@ -18,6 +18,8 @@ const format = {
   stats_channel: String,
   stats_webhook_id: String,
   stats_webhook_message_id: String,
+  expired: Boolean,
+  expired_timestamp: Number,
 };
 
 module.exports = mongoose.model('configurationRecords', format);

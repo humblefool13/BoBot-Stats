@@ -39,9 +39,10 @@ module.exports = {
       });
       const find = await config_records.find({
         discord_id: interaction.user.id,
+        expired: false,
       });
       if (!find.length) return interaction.editReply({
-        content: "You do not have a configuration to replace.",
+        content: "You do not have an active configuration to replace.",
         ephemeral: true,
       });
       let big = false;
