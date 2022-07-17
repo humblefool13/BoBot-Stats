@@ -1,5 +1,6 @@
 const sub_records = require('../models/subscriptionRecords');
 const free_users = require('../models/freeTrials');
+const config_records = require('../models/configurations');
 
 module.exports = {
   name: "freetrial",
@@ -22,15 +23,30 @@ module.exports = {
       if (find) return interaction.editReply({
         content: `The user <@${userid}> had a free trial already.`,
       });
-      const findSubs = await sub_records.find({
+      const active_configs = await config_records.find({
         discord_id: userid,
+        expired: false,
       });
+      const inactive_configs = await config_records.find({
+        discord_id: userid,
+        expired: true,
+      });
+      const inactiveNumbers = inactive_configs.map((el) => el.number);
+      const activeNumbers = active_configs.map((el) => el.number);
+      let freshnumber = 0;
+      let foundNumberB = false;
+      do {
+        ++freshnumber;
+        if (!inactiveNumbers.includes(freshnumber) && !activeNumbers.includes(freshnumber)) {
+          foundNumberB = true;
+        }
+      } while (!foundNumberB)
       await new sub_records({
         discord_id: userid,
         start_timestamp: interaction.createdTimestamp,
         months: 0,
         end_timestamp: interaction.createdTimestamp + 7 * 24 * 60 * 60 * 1000,
-        number: findSubs.length + 1,
+        number: freshnumber,
       }).save().catch((e) => {
         console.log(e);
       });
