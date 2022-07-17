@@ -81,7 +81,7 @@ module.exports = {
             value: config.number.toString(),
           });
         });
-        if (left) {
+        if (left > 0) {
           row.components[0].addOptions({
             label: `${left} Unused Subscriptions`,
             value: `NONE`,
