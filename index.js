@@ -13,7 +13,6 @@ const client = new Client({
 client.interactions = new Collection();
 
 require('./handlers/events')(client);
-require('./handlers/interactions')(client);
 
 require('./databases/salesDB')();
 
