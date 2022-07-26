@@ -1,5 +1,5 @@
 const config_records = require('../models/configurations');
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const fetch = require("node-fetch");
 const { RateLimiter } = require("limiter");
 const limiter_OS_poly = new RateLimiter({
@@ -116,14 +116,14 @@ async function updatePrices() {
 ////////////////////////////////////////////
 
 function embedPoly(stats, slug, cname, pic) {
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setTitle(`${cname} | Live Stats`)
     .setURL(`https://opensea.io/collection/${slug}`)
     .setThumbnail(pic)
     .setTimestamp()
-    .setColor("RANDOM")
+    .setColor("Random")
     .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
-    .addFields(
+    .addFields([
       { name: `Floor Price`, value: `${stats.floor_price}<:matic:997764149746610256>`, inline: true },
       { name: `Average Price`, value: `${stats.average_price.toFixed(4)}<:matic:997764149746610256>`, inline: true },
       { name: `Total Sales`, value: `${stats.total_sales}`, inline: true },
@@ -142,18 +142,18 @@ function embedPoly(stats, slug, cname, pic) {
       { name: `Change 1D`, value: `${stats.one_day_change.toFixed(4)}<:matic:997764149746610256>`, inline: true },
       { name: `Change 7D`, value: `${stats.seven_day_change.toFixed(4)}<:matic:997764149746610256>`, inline: true },
       { name: `Change 30D`, value: `${stats.thirty_day_change.toFixed(4)}<:matic:997764149746610256>`, inline: true },
-    );
+    ]);
   return embed;
 };
 function embedKlay(stats, slug, cname, pic) {
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setTitle(`${cname} | Live Stats`)
     .setURL(`https://opensea.io/collection/${slug}`)
     .setThumbnail(pic)
     .setTimestamp()
-    .setColor("RANDOM")
+    .setColor("Random")
     .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
-    .addFields(
+    .addFields([
       { name: `Floor Price`, value: `${(stats.floor_price / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
       { name: `Average Price`, value: `${(stats.average_price / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
       { name: `Total Sales`, value: `${stats.total_sales}`, inline: true },
@@ -172,20 +172,20 @@ function embedKlay(stats, slug, cname, pic) {
       { name: `Change 1D`, value: `${(stats.one_day_change / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
       { name: `Change 7D`, value: `${(stats.seven_day_change / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
       { name: `Change 30D`, value: `${(stats.thirty_day_change / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
-    );
+    ]);
   return embed;
 };
 function embedEth(stats, slug, name, pic, lrfp, xyfp) {
   const fplr = parseFloat((lrfp / Math.pow(10, 18)).toFixed(4));
   const fpxy = parseFloat((xyfp / Math.pow(10, 18)).toFixed(4));
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setTitle(`${name} | Live Stats`)
     .setURL(`https://opensea.io/collection/${slug}`)
     .setThumbnail(pic)
     .setTimestamp()
-    .setColor("RANDOM")
+    .setColor("Random")
     .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
-    .addFields(
+    .addFields([
       { name: `Floor Prices`, value: `<:OpenSeaLogo:990321456263098398> : ${stats.floor_price}<:ethereum:997764237025890318>`, inline: true },
       { name: '\u200B', value: `<:looksblack:990321530510643340> : ${fplr}<:ethereum:997764237025890318>`, inline: true },
       { name: '\u200B', value: `<:x2y2:992453235610755092> : ${fpxy}<:ethereum:997764237025890318>`, inline: true },
@@ -207,19 +207,19 @@ function embedEth(stats, slug, name, pic, lrfp, xyfp) {
       { name: `Change 1D`, value: `${stats.one_day_change.toFixed(4)}<:ethereum:997764237025890318>`, inline: true },
       { name: `Change 7D`, value: `${stats.seven_day_change.toFixed(4)}<:ethereum:997764237025890318>`, inline: true },
       { name: `Change 30D`, value: `${stats.thirty_day_change.toFixed(4)}<:ethereum:997764237025890318>`, inline: true },
-    );
+    ]);
   return embed;
 };
 function embedSol(stats, meFP, slug, name, pic) {
   const fpMe = parseFloat((meFP / Math.pow(10, 9)).toFixed(4));
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setTitle(`${name} | Live Stats`)
     .setURL(`https://opensea.io/collection/${slug}`)
     .setThumbnail(pic)
     .setTimestamp()
-    .setColor("RANDOM")
+    .setColor("Random")
     .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
-    .addFields(
+    .addFields([
       { name: `Floor Prices`, value: `<:OpenSeaLogo:990321456263098398> : ${(stats.floor_price / sol_eth).toFixed(4)}<:sol:997764346887278623>`, inline: true },
       { name: '\u200B', value: `<:magicEden:990321805665374278> : ${fpMe}<:sol:997764346887278623>`, inline: true },
       { name: '\u200B', value: '\u200B', inline: true },
@@ -241,7 +241,7 @@ function embedSol(stats, meFP, slug, name, pic) {
       { name: `Change 1D`, value: `${(stats.one_day_change / sol_eth).toFixed(4)}<:sol:997764346887278623>`, inline: true },
       { name: `Change 7D`, value: `${(stats.seven_day_change / sol_eth).toFixed(4)}<:sol:997764346887278623>`, inline: true },
       { name: `Change 30D`, value: `${(stats.thirty_day_change / sol_eth).toFixed(4)}<:sol:997764346887278623>`, inline: true },
-    );
+    ]);
   return embed;
 };
 
