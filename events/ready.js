@@ -275,7 +275,7 @@ module.exports = {
       });
     };
     await updateCollections();
-    setInterval(updateCollections, 1000 * 60 * 2);
+    setInterval(updateCollections, 1000 * 60);
 
     ////////////////////////////////////////////////////////////////////////////////////
 
