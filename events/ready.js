@@ -122,7 +122,7 @@ function embedPoly(stats, slug, cname, pic) {
     .setThumbnail(pic)
     .setTimestamp()
     .setColor("Random")
-    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
+    .setFooter({ text: "Powered by bobotlabs.xyz", iconURL: "https://cdn.discordapp.com/attachments/1003741555993100378/1003742971000266752/gif.gif" })
     .addFields([
       { name: `Floor Price`, value: `${stats.floor_price}<:matic:997764149746610256>`, inline: true },
       { name: `Average Price`, value: `${stats.average_price.toFixed(4)}<:matic:997764149746610256>`, inline: true },
@@ -152,7 +152,7 @@ function embedKlay(stats, slug, cname, pic) {
     .setThumbnail(pic)
     .setTimestamp()
     .setColor("Random")
-    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
+    .setFooter({ text: "Powered by bobotlabs.xyz", iconURL: "https://cdn.discordapp.com/attachments/1003741555993100378/1003742971000266752/gif.gif" })
     .addFields([
       { name: `Floor Price`, value: `${(stats.floor_price / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
       { name: `Average Price`, value: `${(stats.average_price / klay_eth).toFixed(4)}<:klay:997764302071148564>`, inline: true },
@@ -184,7 +184,7 @@ function embedEth(stats, slug, name, pic, lrfp, xyfp) {
     .setThumbnail(pic)
     .setTimestamp()
     .setColor("Random")
-    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
+    .setFooter({ text: "Powered by bobotlabs.xyz", iconURL: "https://cdn.discordapp.com/attachments/1003741555993100378/1003742971000266752/gif.gif" })
     .addFields([
       { name: `Floor Prices`, value: `<:OpenSeaLogo:990321456263098398> : ${stats.floor_price}<:ethereum:997764237025890318>`, inline: true },
       { name: '\u200B', value: `<:looksblack:990321530510643340> : ${fplr}<:ethereum:997764237025890318>`, inline: true },
@@ -218,7 +218,7 @@ function embedSol(stats, meFP, slug, name, pic) {
     .setThumbnail(pic)
     .setTimestamp()
     .setColor("Random")
-    .setFooter({ text: 'Powered by BoBot', iconURL: 'https://media.discordapp.net/attachments/797163839765741568/969482807678234725/unknown-1.png?width=452&height=452' })
+    .setFooter({ text: "Powered by bobotlabs.xyz", iconURL: "https://cdn.discordapp.com/attachments/1003741555993100378/1003742971000266752/gif.gif" })
     .addFields([
       { name: `Floor Prices`, value: `<:OpenSeaLogo:990321456263098398> : ${(stats.floor_price / sol_eth).toFixed(4)}<:sol:997764346887278623>`, inline: true },
       { name: '\u200B', value: `<:magicEden:990321805665374278> : ${fpMe}<:sol:997764346887278623>`, inline: true },
