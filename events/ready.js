@@ -40,6 +40,10 @@ const limiter_XY = new RateLimiter({
 const PriceUrl = "https://api.coingecko.com/api/v3/simple/price?ids=solana%2Cklay-token&vs_currencies=eth";
 let sol_eth = 0;
 let klay_eth = 0;
+const options = {
+  method: 'GET',
+  headers: {accept: 'application/json', 'X-API-KEY': process.env['os_key']}
+};
 
 /////////////////////////////////////////////
 
@@ -47,7 +51,7 @@ async function getStatsPoly(collection_slug) {
   const remainingRequests = await limiter_OS_poly.removeTokens(1);
   if (remainingRequests < 0) return;
   const url = `https://api.opensea.io/api/v1/collection/${collection_slug}/stats`
-  const result = await fetch(url);
+  const result = await fetch(url, options);
   const response = await result.json();
   return response;
 };
@@ -55,7 +59,7 @@ async function getStatsKlay(collection_slug) {
   const remainingRequests = await limiter_OS_klay.removeTokens(1);
   if (remainingRequests < 0) return;
   const url = `https://api.opensea.io/api/v1/collection/${collection_slug}/stats`
-  const result = await fetch(url);
+  const result = await fetch(url, options);
   const response = await result.json();
   return response;
 };
@@ -63,7 +67,7 @@ async function getStatsEth(collection_slug) {
   const remainingRequests = await limiter_OS_eth.removeTokens(1);
   if (remainingRequests < 0) return;
   const url = `https://api.opensea.io/api/v1/collection/${collection_slug}/stats`
-  const result = await fetch(url);
+  const result = await fetch(url, options);
   const response = await result.json();
   return response;
 };
@@ -71,7 +75,7 @@ async function getStatsSol(collection_slug) {
   const remainingRequests = await limiter_OS_sol.removeTokens(1);
   if (remainingRequests < 0) return;
   const url = `https://api.opensea.io/api/v1/collection/${collection_slug}/stats`
-  const result = await fetch(url);
+  const result = await fetch(url, options);
   const response = await result.json();
   return response;
 };
